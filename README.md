@@ -1,2 +1,2 @@
-# react-webrtc-chat
+# react-video-chat
  
