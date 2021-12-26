@@ -1,9 +1,7 @@
+import { SERVERS } from './rtc';
 import { THEMES } from './style';
 
-export type Stream = {
-    video: MediaStreamTrack | null,
-    audio: MediaStreamTrack | null
-}
+export type Stream = MediaStream | null
 export type StyleSheet = {
     [key: string]: React.CSSProperties;
 }
@@ -14,11 +12,10 @@ export const DEFAULT_VALUES = {
         video: false,
         audio: false,
     },
-    localStream: {
-        video: null, 
-        audio: null
-    } as Stream,
-    streams: [] as Stream[],
+    peerConnection: new RTCPeerConnection(SERVERS),
+    trackInfo: {} as { [name: string]: RTCRtpSender },
+    localStream: null as Stream,
+    remoteStream: new MediaStream as Stream,
 }
 
 export const CONSTANTS = {

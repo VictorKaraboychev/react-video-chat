@@ -10,12 +10,22 @@ export const atoms = {
 		key: 'media',
 		default: DEFAULT.media
 	}),
+	peerConnection : atom({
+		key: 'peerConnection',
+		default: DEFAULT.peerConnection,
+		dangerouslyAllowMutability: true
+	}),
+	trackInfo : atom({
+		key: 'trackInfo',
+		default: DEFAULT.trackInfo,
+		dangerouslyAllowMutability: true
+	}),
 	localStream: atom({
 		key: 'localStream',
 		default: DEFAULT.localStream
 	}),
-	streams: atom({
-		key: 'streams',
-		default: DEFAULT.streams
+	remoteStream: atom({
+		key: 'remoteStream',
+		default: DEFAULT.remoteStream
 	}),
 }

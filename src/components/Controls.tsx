@@ -2,18 +2,30 @@ import { FaMicrophone, FaMicrophoneSlash, FaVideo, FaVideoSlash, FaMoon, FaSun }
 import { StyleSheet } from '../config/global';
 import { useCustomState } from '../state/state';
 import RoundedButton from './utility/RoundedButton';
+import VideoElement from './video/VideoElement';
 
 const Controls = () => {
 	const { COLORS, THEME, set: setTheme } = useCustomState.theme()
 	const { MEDIA, set: setMedia } = useCustomState.media()
+	const { LOCAL_STREAM } = useCustomState.localStream()
 
 	const styles: StyleSheet = {
 		container: {
-			position: 'absolute',
+			position: 'fixed',
 			display: 'flex',
 			flexDirection: 'row',
 			justifyContent: 'space-between',
+			alignItems: 'center',
 			width: 250,
+			bottom: 50,
+			height: '5%',
+		},
+		local: {
+			position: 'fixed',
+			right: 50,
+			bottom: 50,
+			width: 300,
+			borderRadius: 10
 		}
 	}
 	
@@ -49,6 +61,11 @@ const Controls = () => {
 						audio: MEDIA.audio
 					})
 				}}
+			/>
+			<VideoElement
+				style={styles.local}
+				stream={MEDIA.video ? LOCAL_STREAM.video: null}
+				muted={!MEDIA.audio}
 			/>
 		</div>
 	);
