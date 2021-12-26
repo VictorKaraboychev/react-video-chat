@@ -1,5 +1,5 @@
-import { StyleSheet } from "../../config/global";
-import { useCustomState } from "../../state/state"
+import { StyleSheet } from "../../types/global";
+import useCustomState from "../../state/state"
 import VideoElement from "./VideoElement";
 
 const VideoContainer = () => {
@@ -9,7 +9,7 @@ const VideoContainer = () => {
 	const styles: StyleSheet = {
 		container: {
 			display: 'grid',
-			gridTemplateColumns: '1fr '.repeat(Math.floor(Math.sqrt(STREAMS.length)) + 2),
+			gridTemplateColumns: '1fr '.repeat(Math.floor(Math.sqrt(STREAMS?.getTracks().length || 0)) + 2),
 			width: '100%',
 			margin: 5,
 		},
@@ -28,11 +28,10 @@ const VideoContainer = () => {
 	
 	return (
 		<div style={styles.container}>
-			{ STREAMS ? STREAMS.map((stream, i) => {
+			{ STREAMS ? STREAMS.getTracks().map((track, i) => {
 				return <VideoElement
 					key={i}
-					stream={stream.video}
-					muted={stream.audio == null}
+					stream={track}
 				/>
 			}): null}
 		</div>

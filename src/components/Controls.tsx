@@ -1,6 +1,6 @@
 import { FaMicrophone, FaMicrophoneSlash, FaVideo, FaVideoSlash, FaMoon, FaSun } from 'react-icons/fa'
-import { StyleSheet } from '../config/global';
-import { useCustomState } from '../state/state';
+import { StyleSheet } from '../types/global';
+import useCustomState from '../state/state';
 import RoundedButton from './utility/RoundedButton';
 import VideoElement from './video/VideoElement';
 
@@ -64,7 +64,7 @@ const Controls = () => {
 			/>
 			<VideoElement
 				style={styles.local}
-				stream={MEDIA.video ? LOCAL_STREAM.video: null}
+				stream={MEDIA.video ? LOCAL_STREAM?.getVideoTracks()[0] || null: null}
 				muted={!MEDIA.audio}
 			/>
 		</div>

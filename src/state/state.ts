@@ -1,8 +1,8 @@
 import { RecoilState, useRecoilState } from "recoil"
-import { DEFAULT_VALUES as DEFAULT, Stream } from '../config/global'
+import DEFAULT from '../config/global'
 import { COLORS_BASE, THEMES } from '../config/style'
-import { useRTC } from "../web/connection"
-import { atoms } from "./atoms"
+import useRTC from "../web/connection"
+import atoms from "./atoms"
 
 function usePersistentState<T>(atom: RecoilState<T>, defaultValue: T): { value: T, set: (newValue: T, save?: boolean) => void, load: () => Promise<void> } {
 	const [value, updateValue] = useRecoilState(atom)
@@ -38,7 +38,7 @@ export const useLoad = () => {
 	return { load, unload }
 }
 
-export const useCustomState = {
+const useCustomState = {
 	theme: () => {
 		const { value, set, load } = usePersistentState(atoms.theme, DEFAULT.theme)
 
@@ -47,45 +47,9 @@ export const useCustomState = {
 
 		return { COLORS, THEME: value, set, load }
 	},
-	peerConnection: () => {
-		const [ peerConnection, setPeer ] = useRecoilState(atoms.peerConnection)
-		const [ trackInfo, setTrackInfo ] = useRecoilState(atoms.trackInfo)
-
-		const load = () => {
-			peerConnection.ontrack
-		}
-
-		const addTracks = (tracks: MediaStreamTrack[]) => {
-			tracks.forEach((track) => {
-				trackInfo[track.id] = peerConnection.addTrack(track)
-			})
-		}
-
-		const removeStream = (tracks: MediaStreamTrack[]) => {
-			tracks.forEach((track) => {
-				peerConnection.removeTrack(trackInfo[track.id])
-			})	
-		}
-	
-		const onTrackReceived = (callback: (track: MediaStreamTrack) => void) => {
-			peerConnection.ontrack = (event) => {
-				event.streams[0].getTracks().forEach((track) => {
-					callback(track)
-				})
-			}
-		}
-	
-		const onDataChannelReceived = (callback: (stream: RTCDataChannel) => void) => {
-			peerConnection.ondatachannel = (event) => {
-				callback(event.channel)
-			}
-		}
-
-		return { PEER_CONNECTION: peerConnection, addStream: addTracks, removeStream, onTrackReceived, onDataChannelReceived}
-	},
 	media: () => {
 		const [ value, setMedia ] = useRecoilState(atoms.media)
-		const { onTrackReceived } = useCustomState.peerConnection()
+		const { onTrackReceived } = useRTC()
 
 		return { MEDIA: value, set: setMedia }
 	},
@@ -100,7 +64,7 @@ export const useCustomState = {
 	},
 	streams: () => {
 		const [ value, set ] = useRecoilState(atoms.remoteStream)
-		const { onTrackReceived } = useCustomState.peerConnection()
+		const { onTrackReceived } = useRTC()
 
 		const load = async () => {
 			
@@ -113,3 +77,5 @@ export const useCustomState = {
 		return { STREAMS: value, set, load }
 	},
 }
+
+export default useCustomState

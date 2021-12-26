@@ -1,6 +1,6 @@
 import { IconType } from 'react-icons';
-import { StyleSheet } from '../../config/global';
-import { useCustomState } from '../../state/state';
+import { StyleSheet } from '../../types/global';
+import useCustomState from '../../state/state';
 
 const RoundedButton = (props: { visible?: boolean; Icon: IconType; label?: string; radius?: number; color?: string; onPress: () => void; }) => {
     const { COLORS } = useCustomState.theme()

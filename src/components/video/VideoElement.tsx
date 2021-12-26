@@ -1,7 +1,7 @@
 import { FaMicrophoneSlash } from 'react-icons/fa'
 import { useCallback } from "react";
-import { StyleSheet } from "../../config/global";
-import { useCustomState } from "../../state/state"
+import { StyleSheet } from "../../types/global";
+import useCustomState from "../../state/state"
 
 const VideoElement = (props: { style?: React.CSSProperties; stream: MediaStreamTrack | null; muted?: boolean; }) => {
 	const { COLORS } = useCustomState.theme()

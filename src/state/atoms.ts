@@ -1,7 +1,7 @@
 import { atom } from 'recoil'
-import { DEFAULT_VALUES as DEFAULT } from '../config/global'
+import DEFAULT from '../config/global'
 
-export const atoms = {
+const atoms = {
 	theme: atom({
 		key: 'theme',
 		default: DEFAULT.theme
@@ -29,3 +29,5 @@ export const atoms = {
 		default: DEFAULT.remoteStream
 	}),
 }
+
+export default atoms

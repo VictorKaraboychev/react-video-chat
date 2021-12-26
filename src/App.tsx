@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import Controls from "./components/Controls";
 import VideoContainer from "./components/video/VideoContainer";
-import { StyleSheet } from "./config/global";
-import { useCustomState } from "./state/state"
+import { StyleSheet } from "./types/global";
+import useCustomState from "./state/state"
 import { useLoad } from './state/state';
 
 const App = () => {
