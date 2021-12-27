@@ -1,4 +1,4 @@
-import { FaMicrophone, FaMicrophoneSlash, FaVideo, FaVideoSlash, FaMoon, FaSun } from 'react-icons/fa'
+import { FaMicrophone, FaMicrophoneSlash, FaVideo, FaVideoSlash, FaMoon, FaSun, FaPhone, FaPhoneSlash } from 'react-icons/fa'
 import { StyleSheet } from '../types/global';
 import useCustomState from '../state/state';
 import RoundedButton from './common/RoundedButton';
@@ -6,7 +6,8 @@ import VideoElement from './video/VideoElement';
 
 const Controls = () => {
 	const { COLORS, THEME, set: setTheme } = useCustomState.theme()
-	const { MEDIA, set: setMedia } = useCustomState.media()
+	const { MEDIA, setVideo, setAudio } = useCustomState.media()
+	const { USER_ID } = useCustomState.userId()
 	const { LOCAL_STREAM } = useCustomState.localStream()
 
 	const styles: StyleSheet = {
@@ -15,10 +16,13 @@ const Controls = () => {
 			display: 'flex',
 			flexDirection: 'row',
 			justifyContent: 'space-between',
-			alignItems: 'center',
-			width: 250,
+			alignItems: 'end',
+			width: 500,
 			bottom: 50,
 			height: '5%',
+		},
+		mediaContainer: {
+			display: 'flex',
 		},
 		local: {
 			position: 'fixed',
@@ -26,14 +30,40 @@ const Controls = () => {
 			bottom: 50,
 			width: 300,
 			borderRadius: 10
+		},
+		header: {
+			position: 'fixed',
+			left: 50,
+			bottom: 50,
+			color: COLORS.theme.text.primary,
+			fontSize: 25,
+			fontWeight: 'bold',
+			alignItems: 'center',
+		},
+		input: {
+			border: 0,
+			borderRadius: 10,
+			height: 30,
+			width: 250,
+			marginLeft: 10,
+			backgroundColor: COLORS.theme.background.quaternary,
+			color: COLORS.theme.text.secondary,
+			fontSize: 25,
+			fontStyle: 'italic',
+			textAlign: 'center',
 		}
 	}
 	
 	return (
 		<div style={styles.container}>
+			<div style={styles.header}>
+				Meeting Code: 
+				<input style={styles.input} type={"text"} pattern={"[A-Za-z0-9]"} maxLength={10}/>
+			</div>
 			<RoundedButton
 				Icon={THEME == 'light' ? FaSun : FaMoon}
 				radius={75}
+				label={"Theme"}
 				onPress={() => { 
 					if (THEME == 'light') {
 						setTheme('dark')
@@ -43,25 +73,30 @@ const Controls = () => {
 				}}
 			/>
 			<RoundedButton
-				Icon={MEDIA.audio ? FaMicrophone : FaMicrophoneSlash}
+				Icon={FaPhone}
 				radius={75}
+				label={"Start Call"}
 				onPress={() => {
-					setMedia({
-						video: MEDIA.video,
-						audio: !MEDIA.audio
-					})
 				}}
 			/>
-			<RoundedButton
-				Icon={MEDIA.video ? FaVideo : FaVideoSlash}
-				radius={75}
-				onPress={() => {
-					setMedia({
-						video: !MEDIA.video,
-						audio: MEDIA.audio
-					})
-				}}
-			/>
+			<div style={styles.mediaContainer}>
+				<RoundedButton
+					Icon={MEDIA.audio ? FaMicrophone : FaMicrophoneSlash}
+					radius={75}
+					label={"Audio"}
+					onPress={() => {
+						setAudio(!MEDIA.audio)
+					}}
+				/>
+				<RoundedButton
+					Icon={MEDIA.video ? FaVideo : FaVideoSlash}
+					radius={75}
+					label={"Video"}
+					onPress={() => {
+						setVideo(!MEDIA.video)
+					}}
+				/>
+			</div>
 			<VideoElement
 				style={styles.local}
 				stream={MEDIA.video ? LOCAL_STREAM?.getVideoTracks()[0] || null: null}

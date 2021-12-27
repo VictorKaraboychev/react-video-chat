@@ -5,13 +5,13 @@ import atoms from "../state/atoms"
 import useCustomState from "../state/state";
 
 const useRTC = () => {
-	const [ peerConnection, setPeer ] = useRecoilState(atoms.peerConnection)
-	const [ trackInfo, setTrackInfo ] = useRecoilState(atoms.trackInfo)
+	const [ peerConnection ] = useRecoilState(atoms.peerConnection)
+	const [ trackInfo ] = useRecoilState(atoms.trackInfo)
 
 	const load = () => {
 	}
 
-	const addTracks = (tracks: MediaStreamTrack[]) => {
+	const addTracks = (tracks: MediaStreamTrack[]) => {-
 		tracks.forEach((track) => {
 			trackInfo[track.id] = peerConnection.addTrack(track)
 		})
@@ -27,7 +27,7 @@ const useRTC = () => {
 		peerConnection.addIceCandidate(iceCandidate)
 	}
 
-	const onTrackReceived = (callback: (track: MediaStreamTrack) => void) => {
+	const onTrackAdded = (callback: (track: MediaStreamTrack) => void) => {
 		peerConnection.ontrack = (event) => {
 			event.streams[0].getTracks().forEach((track) => {
 				callback(track)
@@ -47,7 +47,7 @@ const useRTC = () => {
 		}
 	}
 
-	return { PEER_CONNECTION: peerConnection, load, addTracks, removeTracks, addIceCandidate, onTrackReceived, onDataChannelReceived, onIceCandidateGenerated }
+	return { PEER_CONNECTION: peerConnection, load, addTracks, removeTracks, addIceCandidate, onTrackAdded, onDataChannelReceived, onIceCandidateGenerated }
 }
 
 export const useSocket = () => {
@@ -55,7 +55,9 @@ export const useSocket = () => {
 	const { USER_ID } = useCustomState.userId()
 	
 	const load = () => {
-		set(io(SERVER_URL))
+		// try {
+		// 	set(io(SERVER_URL))
+		// } catch (err) {console.warn(err)}
 	}
 
 	const onConnect = (callback: () => void) => {

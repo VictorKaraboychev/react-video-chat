@@ -2,6 +2,7 @@ import { RecoilState, useRecoilState } from "recoil"
 import { v4 as uuidv4 } from "uuid"
 import DEFAULT from '../config/global'
 import { COLORS_BASE, THEMES } from '../config/style'
+import { deepCopy } from "../utility/functions"
 import useRTC, { useSocket } from "../web/connection"
 import atoms from "./atoms"
 
@@ -61,8 +62,30 @@ const useCustomState = {
 	},
 	media: () => {
 		const [ value, set ] = useRecoilState(atoms.media)
+		const { LOCAL_STREAM } = useCustomState.localStream()
+		const { addTracks, removeTracks } = useRTC()
 
-		return { MEDIA: value, set }
+		const setVideo = (state: boolean) => {
+			const video = LOCAL_STREAM?.getVideoTracks() || []
+			state ? addTracks(video) : removeTracks(video)
+
+			set({
+				video: state,
+				audio: value.audio
+			})
+		}
+
+		const setAudio = (state: boolean) => {
+			const audio = LOCAL_STREAM?.getAudioTracks() || []
+			state ? addTracks(audio) : removeTracks(audio)
+
+			set({
+				video: value.video,
+				audio: state
+			})
+		}
+
+		return { MEDIA: value, setVideo, setAudio}
 	},
 	userId: () => {
 		const [ value, set ] = useRecoilState(atoms.userId)
@@ -84,11 +107,13 @@ const useCustomState = {
 	},
 	remoteStream: () => {
 		const [ value, set ] = useRecoilState(atoms.remoteStream)
-		const { onTrackReceived } = useRTC()
+		const { onTrackAdded } = useRTC()
 
 		const load = () => {
-			onTrackReceived((track) => {
-				set(value?.addTrack(track) || null) // might need to be deep copied
+			onTrackAdded((track) => {
+				const tempStreams = deepCopy(value)
+				tempStreams?.addTrack(track)
+				set(tempStreams)
 			})
 		}
 
