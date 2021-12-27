@@ -1,5 +1,5 @@
-import { Stream, TrackInfo } from '../types/global';
-import { SERVERS } from './rtc';
+import { SocketConnection, Stream, TrackInfo } from '../types/global';
+import { SERVERS } from './connection';
 import { THEMES } from './style';
 
 const DEFAULT = {
@@ -8,7 +8,9 @@ const DEFAULT = {
         video: false,
         audio: false,
     },
+    userId: '',
     peerConnection: new RTCPeerConnection(SERVERS),
+    socket: null as SocketConnection,
     trackInfo: {} as TrackInfo,
     localStream: null as Stream,
     remoteStream: new MediaStream as Stream,

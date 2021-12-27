@@ -1,7 +1,7 @@
 import { FaMicrophone, FaMicrophoneSlash, FaVideo, FaVideoSlash, FaMoon, FaSun } from 'react-icons/fa'
 import { StyleSheet } from '../types/global';
 import useCustomState from '../state/state';
-import RoundedButton from './utility/RoundedButton';
+import RoundedButton from './common/RoundedButton';
 import VideoElement from './video/VideoElement';
 
 const Controls = () => {

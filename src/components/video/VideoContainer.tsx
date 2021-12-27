@@ -4,12 +4,12 @@ import VideoElement from "./VideoElement";
 
 const VideoContainer = () => {
 	const { COLORS } = useCustomState.theme()
-	const { STREAMS } = useCustomState.streams()
+	const { REMOTE_STREAM } = useCustomState.remoteStream()
 
 	const styles: StyleSheet = {
 		container: {
 			display: 'grid',
-			gridTemplateColumns: '1fr '.repeat(Math.floor(Math.sqrt(STREAMS?.getTracks().length || 0)) + 2),
+			gridTemplateColumns: '1fr '.repeat(Math.floor(Math.sqrt(REMOTE_STREAM?.getTracks().length || 0)) + 2),
 			width: '100%',
 			margin: 5,
 		},
@@ -28,7 +28,7 @@ const VideoContainer = () => {
 	
 	return (
 		<div style={styles.container}>
-			{ STREAMS ? STREAMS.getTracks().map((track, i) => {
+			{ REMOTE_STREAM ? REMOTE_STREAM.getTracks().map((track, i) => {
 				return <VideoElement
 					key={i}
 					stream={track}

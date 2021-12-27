@@ -6,3 +6,5 @@ export const SERVERS = {
 	],
 	iceCandidatePoolSize: 10,
 };
+
+export const SERVER_URL = "http://localhost:5000"

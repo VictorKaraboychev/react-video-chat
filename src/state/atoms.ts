@@ -10,10 +10,18 @@ const atoms = {
 		key: 'media',
 		default: DEFAULT.media
 	}),
+	userId: atom({
+		key: 'userId',
+		default: DEFAULT.userId
+	}),
 	peerConnection : atom({
 		key: 'peerConnection',
 		default: DEFAULT.peerConnection,
 		dangerouslyAllowMutability: true
+	}),
+	socket : atom({
+		key: 'socket',
+		default: DEFAULT.socket,
 	}),
 	trackInfo : atom({
 		key: 'trackInfo',
