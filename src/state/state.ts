@@ -1,22 +1,22 @@
-import { RecoilState, useRecoilState } from "recoil"
-import { v4 as uuidv4 } from "uuid"
-import DEFAULT from '../config/global'
+import { useRecoilState } from "recoil"
 import { COLORS_BASE, THEMES } from '../config/style'
+import { CustomAtom } from "../types/global"
 import { deepCopy } from "../utility/functions"
 import useRTC, { useSocket } from "../web/connection"
 import atoms from "./atoms"
 
-function usePersistentState<T>(atom: RecoilState<T>, defaultValue: T): { value: T, set: (newValue: T, save?: boolean) => void, load: () => void } {
-	const [value, updateValue] = useRecoilState(atom)
+function usePersistentState<T>(atom: CustomAtom<T>): { value: T, set: (newValue: T, save?: boolean) => void, load: () => void } {
+	const state = atom.state
+	const [value, updateValue] = useRecoilState(state)
 
 	const load = () => {
-		const retrieved = localStorage.getItem(atom.key)
-		updateValue(retrieved ? JSON.parse(retrieved) : defaultValue)
+		const retrieved = localStorage.getItem(state.key)
+		updateValue(retrieved ? JSON.parse(retrieved) : atom.default)
 	}
 
 	const set = (newValue: T, save = true) => {
 		updateValue(newValue)
-		if (save) localStorage.setItem(atom.key, JSON.stringify(newValue))
+		if (save) localStorage.setItem(state.key, JSON.stringify(newValue))
 	}
 
 	return { value, set, load }
@@ -24,18 +24,14 @@ function usePersistentState<T>(atom: RecoilState<T>, defaultValue: T): { value: 
 
 export const useLoad = () => {
 	const { load: loadTheme } = useCustomState.theme()
-	const { load: loadUserId } = useCustomState.userId()
 	const { load: loadLocalStream } = useCustomState.localStream()
 	const { load: loadRemoteStream } = useCustomState.remoteStream()
 	const { load: loadRTC } = useRTC()
-	const { load: loadSocket } = useSocket()
 
 	const load = () => {
-		loadUserId()
 		loadTheme()
 
 		loadRTC()
-		loadSocket()
 
 		loadLocalStream()
 		loadRemoteStream()
@@ -53,7 +49,7 @@ export const useLoad = () => {
 
 const useCustomState = {
 	theme: () => {
-		const { value, set, load } = usePersistentState(atoms.theme, DEFAULT.theme)
+		const { value, set, load } = usePersistentState(atoms.theme)
 
 		const COLORS = COLORS_BASE
 		COLORS.theme = THEMES[value]
@@ -61,7 +57,7 @@ const useCustomState = {
 		return { COLORS, THEME: value, set, load }
 	},
 	media: () => {
-		const [ value, set ] = useRecoilState(atoms.media)
+		const [ value, set ] = useRecoilState(atoms.media.state)
 		const { LOCAL_STREAM } = useCustomState.localStream()
 		const { addTracks, removeTracks } = useRTC()
 
@@ -88,16 +84,19 @@ const useCustomState = {
 		return { MEDIA: value, setVideo, setAudio}
 	},
 	userId: () => {
-		const [ value, set ] = useRecoilState(atoms.userId)
+		const [ value, set ] = useRecoilState(atoms.userId.state)
+		const { onConnect } = useSocket()
 
-		const load = () => {
-			set(uuidv4())
-		}
+		onConnect(set)
 
-		return { USER_ID: value, load }
+		return { USER_ID: value }
+	},
+	connection: () => {
+		const [ value, set ] = useRecoilState(atoms.connection.state)
+		return { CONNECTION: value, set}
 	},
 	localStream: () => {
-		const [ value, set ] = useRecoilState(atoms.localStream)
+		const [ value, set ] = useRecoilState(atoms.localStream.state)
 
 		const load = async () => {
 			set(await navigator.mediaDevices.getUserMedia({ audio: true, video: true }).catch(err => console.warn('MEDIA', err)) || null)
@@ -106,7 +105,7 @@ const useCustomState = {
 		return { LOCAL_STREAM: value, load }
 	},
 	remoteStream: () => {
-		const [ value, set ] = useRecoilState(atoms.remoteStream)
+		const [ value, set ] = useRecoilState(atoms.remoteStream.state)
 		const { onTrackAdded } = useRTC()
 
 		const load = () => {

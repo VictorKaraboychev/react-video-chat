@@ -4,6 +4,7 @@ import VideoContainer from "./components/video/VideoContainer";
 import { StyleSheet } from "./types/global";
 import useCustomState from "./state/state"
 import { useLoad } from './state/state';
+import { useSocket } from "./web/connection";
 
 const App = () => {
 	const { load, unload } = useLoad()

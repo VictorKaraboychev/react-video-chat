@@ -2,11 +2,12 @@ import { useRecoilState } from "recoil";
 import { io } from "socket.io-client";
 import { SERVER_URL } from "../config/connection";
 import atoms from "../state/atoms"
-import useCustomState from "../state/state";
+
+const socket = io(SERVER_URL)
 
 const useRTC = () => {
-	const [ peerConnection ] = useRecoilState(atoms.peerConnection)
-	const [ trackInfo ] = useRecoilState(atoms.trackInfo)
+	const [ peerConnection ] = useRecoilState(atoms.peerConnection.state)
+	const [ trackInfo ] = useRecoilState(atoms.trackInfo.state)
 
 	const load = () => {
 	}
@@ -51,40 +52,35 @@ const useRTC = () => {
 }
 
 export const useSocket = () => {
-	const [ socket, set ] = useRecoilState(atoms.socket)
-	const { USER_ID } = useCustomState.userId()
-	
-	const load = () => {
-		// try {
-		// 	set(io(SERVER_URL))
-		// } catch (err) {console.warn(err)}
+	// const [ socket, set ] = useRecoilState(atoms.socket.state)
+
+	const sendRoomId = (roomId?: string) => {
+		socket.emit("room-id", roomId)
 	}
 
-	const onConnect = (callback: () => void) => {
-		socket?.on("connect", callback)
+	const sendIceCandidate = (iceCandidate: RTCIceCandidate) => {
+		socket.emit("ice-candidate", iceCandidate.toJSON())
+	}
+
+	const onConnect = (callback: (clientId: string) => void) => {
+		socket.on("client-id", callback)
 	}
 	
 	const onDisconnect = (callback: () => void) => {
-		socket?.on("disconnect", callback)
+		socket.on("disconnect", callback)
 	}
 	
-	const sendRoomRequest = () => {
-		socket?.send("room-request", USER_ID)
+	const onRoomIdReceived = (callback: (roomId: string) => void ) => {
+		socket.on("room-id", callback)
 	}
 
-	const sendIceCandidate = () => {
-		socket?.send("ice-candidate", USER_ID)
+	const onIceCandidateReceived = (callback: (iceCandidate: RTCIceCandidate) => void) => {
+		socket.on("ice-candidate", (iceCandidateJSON: RTCIceCandidateInit) => {
+			callback(new RTCIceCandidate(iceCandidateJSON))
+		})
 	}
 
-	const onRoomIdReceived = (callback: () => string) => {
-		socket?.emit("room-id", callback)
-	}
-
-	const onIceCandidateReceived = (callback: () => string) => {
-		socket?.emit("ice-candidate", callback)
-	}
-
-	return { SOCKET: socket, load, sendRoomRequest, sendIceCandidate, onConnect, onDisconnect, onRoomIdReceived, onIceCandidateReceived }
+	return { SOCKET: socket, sendRoomId, sendIceCandidate, onConnect, onDisconnect, onRoomIdReceived, onIceCandidateReceived }
 }
 
 export default useRTC

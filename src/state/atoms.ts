@@ -1,41 +1,29 @@
 import { atom } from 'recoil'
-import DEFAULT from '../config/global'
+import { SERVERS } from '../config/connection'
+import { THEMES } from '../config/style'
+import { CustomAtom, SocketConnection, Stream, TrackInfo } from '../types/global'
+
+function customAtom<T>(label: string, def: T, mutability?: boolean): CustomAtom<T> {
+	return {
+		state: atom({
+			key: label,
+			default: def,
+			dangerouslyAllowMutability: mutability || false
+		}),
+		default: def
+	}
+}
 
 const atoms = {
-	theme: atom({
-		key: 'theme',
-		default: DEFAULT.theme
-	}),
-	media: atom({
-		key: 'media',
-		default: DEFAULT.media
-	}),
-	userId: atom({
-		key: 'userId',
-		default: DEFAULT.userId
-	}),
-	peerConnection : atom({
-		key: 'peerConnection',
-		default: DEFAULT.peerConnection,
-		dangerouslyAllowMutability: true
-	}),
-	socket : atom({
-		key: 'socket',
-		default: DEFAULT.socket,
-	}),
-	trackInfo : atom({
-		key: 'trackInfo',
-		default: DEFAULT.trackInfo,
-		dangerouslyAllowMutability: true
-	}),
-	localStream: atom({
-		key: 'localStream',
-		default: DEFAULT.localStream
-	}),
-	remoteStream: atom({
-		key: 'remoteStream',
-		default: DEFAULT.remoteStream
-	}),
+    theme: customAtom('theme', 'light' as keyof typeof THEMES),
+    media: customAtom('media', { video: false, audio: false }),
+    userId: customAtom('userId', ''),
+    connection: customAtom('connection', false),
+    peerConnection: customAtom('peerConnection', new RTCPeerConnection(SERVERS), true),
+    socket: customAtom('socket', null as SocketConnection),
+    trackInfo: customAtom('trackInfo', {} as TrackInfo, true),
+    localStream: customAtom('localStream', null as Stream),
+    remoteStream: customAtom('remoteStream', new MediaStream as Stream),
 }
 
 export default atoms

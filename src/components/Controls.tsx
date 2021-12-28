@@ -3,12 +3,28 @@ import { StyleSheet } from '../types/global';
 import useCustomState from '../state/state';
 import RoundedButton from './common/RoundedButton';
 import VideoElement from './video/VideoElement';
+import { useSocket } from '../web/connection';
+import { useEffect, useState } from 'react';
 
 const Controls = () => {
 	const { COLORS, THEME, set: setTheme } = useCustomState.theme()
 	const { MEDIA, setVideo, setAudio } = useCustomState.media()
-	const { USER_ID } = useCustomState.userId()
 	const { LOCAL_STREAM } = useCustomState.localStream()
+	const { CONNECTION, set: setConnection } = useCustomState.connection()
+	const { sendRoomId, onRoomIdReceived, onConnect } = useSocket()
+
+	const [roomId, setRoomId] = useState('')
+
+	useEffect(() => {
+		onRoomIdReceived(id => {
+			setRoomId(id)
+			setConnection(true)
+		})
+
+		onConnect(id => {
+			console.log('clientId:', id)
+		})
+	},[])
 
 	const styles: StyleSheet = {
 		container: {
@@ -57,8 +73,16 @@ const Controls = () => {
 	return (
 		<div style={styles.container}>
 			<div style={styles.header}>
-				Meeting Code: 
-				<input style={styles.input} type={"text"} pattern={"[A-Za-z0-9]"} maxLength={10}/>
+				Meeting Code:
+				<input style={styles.input} type={"text"} maxLength={10} value={roomId} disabled={CONNECTION} onChange={(event) => {
+					const value = event.target.value.trim()
+
+					if (!/^[A-Za-z0-9]*$/.test(value)) {
+						event.target.value = roomId
+					} else if (value !== roomId) {
+						setRoomId(value)
+					}
+				}}/>
 			</div>
 			<RoundedButton
 				Icon={THEME == 'light' ? FaSun : FaMoon}
@@ -73,10 +97,11 @@ const Controls = () => {
 				}}
 			/>
 			<RoundedButton
-				Icon={FaPhone}
+				Icon={CONNECTION ? FaPhoneSlash : FaPhone}
 				radius={75}
 				label={"Start Call"}
 				onPress={() => {
+					sendRoomId(roomId)
 				}}
 			/>
 			<div style={styles.mediaContainer}>
